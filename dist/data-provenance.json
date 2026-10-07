@@ -1,0 +1,11 @@
+{
+  "source": "USDA FoodData Central SR Legacy",
+  "release": "April 2018",
+  "download": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip",
+  "sha256": "b80817294b8850530aaedf2e515c02593b1824f763a0ff356e5c2081643e6fd0",
+  "records": 7793,
+  "basis": "per 100 g edible portion",
+  "missingNutrients": "null, never assumed zero",
+  "dietClassification": "Category and keyword heuristic; inspect ingredients for strict dietary requirements.",
+  "indianData": "IFCT reference identified; not yet imported or represented as verified IFCT values."
+}

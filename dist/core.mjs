@@ -1,0 +1,6 @@
+export const keys=['kcal','protein','fat','carbs','fiber'];
+export function scale(nutrients,grams){if(!Number.isFinite(grams)||grams<=0||grams>10000)throw Error('Enter a quantity between 0 and 10,000 grams.');return Object.fromEntries(keys.map(k=>[k,nutrients[k]==null?null:nutrients[k]*grams/100]));}
+export function totals(meals){const out=Object.fromEntries(keys.map(k=>[k,0]));out.missing=[];for(const m of meals)for(const k of keys){if(m.nutrients[k]==null){if(!out.missing.includes(k))out.missing.push(k);}else out[k]+=m.nutrients[k];}return out;}
+export function localDate(d=new Date()){const offset=d.getTimezoneOffset();return new Date(d.getTime()-offset*60000).toISOString().slice(0,10);}
+export function weightTrend(days,date){const entries=Object.entries(days).filter(([d,v])=>d<=date&&v.weight!=null).sort(([a],[b])=>a.localeCompare(b));if(entries.length<2)return null;const latest=entries.at(-1),previous=entries.at(-2);return {delta:latest[1].weight-previous[1].weight,from:previous[0],to:latest[0]};}
+export function averageWeight(days,start,end){const vals=Object.entries(days).filter(([d,v])=>d>=start&&d<=end&&v.weight!=null).map(([,v])=>v.weight);return {value:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null,count:vals.length};}

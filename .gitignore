@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+.venv/
+node_modules/
+.DS_Store
+*.key
+*credentials*.json
+*service-account*.json
+deployment.local.env
