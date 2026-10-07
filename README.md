@@ -72,3 +72,15 @@ Diet tags are conservative category/keyword heuristics, not ingredient-level gua
 ## GitHub
 
 Local Git history is initialized. Remote repository creation/push remains pending because the connected GitHub tools exposed no creation action and browser access was blocked. Suggested private repository: `sprout-fitness`. Do not commit credentials or personal diary exports. Once repository access is available, attach the remote and push `main`.
+
+## Personal experience revision — October 7, 2026
+
+The earlier companion has been removed from the UI. A temporary monogram reserves the avatar position until the user supplies a face photo for a male likeness. The new dark spatial stage uses pointer-responsive perspective and layered live metrics, with reduced-motion support; it is not a fully rigged 3D character.
+
+Food Studio now opens on familiar foods and combinations, with a meal tray that recalculates every portion before a deliberate log action. Chobani/yogurt/yoghurt/yogrut search resolves the curated Chobani 20g Vanilla 190g cup. Its photographed label reads 140 kcal, 20g protein, 3g fat, 9g carbohydrate and **2g fiber**. Source: https://giantfood.com/groceries/product/chobani-20g-protein-lowfat-vanilla-greek-yogurt-cup-6-7-oz-cup/370506. The photo is product imagery supplied via Giant Food/Syndigo, not generated packaging; rights remain with its owners. Other flavors and sizes are not assumed to match.
+
+Chana curry and latte presets carry explicit estimate labels from the user's supplied prior conversation. The curry image is AI-generated illustrative food photography. Historical meals were not imported because their dates are unknown. New profiles use the prior 2,100 kcal / 95g protein goals. Existing unchanged starter targets (2,000/100) migrate once; customized values remain intact.
+
+Training includes a draft no-door-anchor upper/lower split, a three-day full-body fallback, and 12-week progression guidance. HASfit source: https://hasfit.com/workouts/home/strength-weight-training/full-body-resistance-band-workout/. General activity source: https://www.cdc.gov/physical-activity-basics/guidelines/adults.html. This is not a guaranteed-results or personalized clinical program.
+
+Validation: seven JavaScript nutrition/catalog/preset tests and five Python validation tests pass. Browser access was retried and remains blocked by the unavailable admin-policy check, so visual and interaction QA remain unverified. GCS, BigQuery and remote GitHub deployment remain pending as before.

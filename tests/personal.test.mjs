@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {personalCatalog,matchesFood} from '../dist/personal.mjs';
+import {scale,totals} from '../dist/core.mjs';
+const original=JSON.parse(readFileSync(new URL('../dist/foods.json',import.meta.url)));
+const personal=personalCatalog(original);
+test('Chobani matches misspellings and preserves the pictured 190g product label',()=>{const f=personal.extras[0];assert.ok(matchesFood(f,'chobani yogrut'));const t=scale(f.nutrients,190);for(const [k,v]of Object.entries({kcal:140,protein:20,fat:3,carbs:9,fiber:2}))assert.ok(Math.abs(t[k]-v)<1e-10);assert.equal(f.defaultGrams,190);});
+test('historic curry stays an explicitly marked estimate rather than a diary entry',()=>{const f=personal.extras.find(f=>f.id==='estimate-chana-curry');assert.equal(f.estimated,true);assert.ok(Math.abs(scale(f.nutrients,450).kcal-600)<1e-10);assert.ok(f.note.includes('15–20'));assert.equal(personal.days,undefined);});
+test('combos reference real foods and recalculate with the portion change',()=>{const map=new Map([...original,...personal.extras].map(f=>[f.id,f]));for(const combo of personal.combos){const meals=combo.items.map(([id,g])=>{assert.ok(map.has(id));return {nutrients:scale(map.get(id).nutrients,g)};});const base=totals(meals),twice=totals(combo.items.map(([id,g])=>({nutrients:scale(map.get(id).nutrients,g*2)})));assert.ok(Math.abs(base.protein*2-twice.protein)<1e-8);assert.ok(Math.abs(base.kcal*2-twice.kcal)<1e-8);}});
