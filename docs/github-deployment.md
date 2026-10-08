@@ -2,6 +2,8 @@
 
 Repository: https://github.com/nikhnara/sprout-fitness
 
+GCP project supplied by the owner: `sprout-fitness`. Access, billing, and resources are not yet verified. Planned region: `us-central1`. See `infra/sprout.tfvars.example`; no credentials belong in this file.
+
 The production source of truth is `main`. Google Cloud fetches commits through its GitHub connection and executes `cloudbuild.yaml`. No local deployment or GitHub-stored service-account key is required.
 
 ## Release path

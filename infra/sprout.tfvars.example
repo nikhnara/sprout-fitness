@@ -1,0 +1,10 @@
+# Copy to a local .tfvars file after completing the one-time cloud connection.
+# Names are planned defaults; bucket availability must be checked before apply.
+project_id = "sprout-fitness"
+region = "us-central1"
+bucket_name = "sprout-fitness-ui"
+# Leave empty until the GitHub connection, OAuth client and HTTPS origin are ready.
+github_repository_resource = ""
+owner_email = ""
+google_client_id = ""
+frontend_origin = ""
