@@ -56,6 +56,21 @@ resource "google_cloudbuild_trigger" "main" {
     _GOOGLE_CLIENT_ID = var.google_client_id
     _FRONTEND_ORIGIN = var.frontend_origin
   }
-  depends_on = [google_project_iam_member.build_roles, google_service_account_iam_member.build_runtime, google_artifact_registry_repository_iam_member.build_images, google_storage_bucket_iam_member.build_assets]
+  depends_on = [google_project_iam_member.build_roles, google_service_account_iam_member.build_runtime, google_artifact_registry_repository_iam_member.build_images, google_storage_bucket_iam_member.build_assets, google_storage_bucket_iam_member.web_assets, google_service_account_iam_member.build_web]
 }
 output "build_service_account" { value = google_service_account.build.email }
+
+resource "google_service_account" "web" {
+  account_id = "sprout-web"
+  display_name = "Sprout HTTPS frontend"
+}
+resource "google_storage_bucket_iam_member" "web_assets" {
+  bucket = google_storage_bucket.frontend.name
+  role = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.web.email}"
+}
+resource "google_service_account_iam_member" "build_web" {
+  service_account_id = google_service_account.web.name
+  role = "roles/iam.serviceAccountUser"
+  member = "serviceAccount:${google_service_account.build.email}"
+}

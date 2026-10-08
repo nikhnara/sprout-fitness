@@ -66,6 +66,12 @@ def deploy(c):
         '--exclude=^index\\.html$', '--cache-control=no-cache', '--project', c['PROJECT_ID'])
     run('gcloud', 'storage', 'cp', 'dist/index.html', bucket + '/index.html',
         '--cache-control=no-cache', '--project', c['PROJECT_ID'])
+    web_image = c['IMAGE_URI'].replace('/sprout/api:', '/sprout/web:')
+    run('gcloud', 'run', 'deploy', 'sprout-web', '--image', web_image,
+        '--project', c['PROJECT_ID'], '--region', c['REGION'],
+        '--service-account', f"sprout-web@{c['PROJECT_ID']}.iam.gserviceaccount.com",
+        '--set-env-vars', 'UI_BUCKET=' + c['BUCKET_NAME'], '--allow-unauthenticated',
+        '--max-instances', '2', '--memory', '512Mi', '--quiet')
     print('Deployed commit image:', c['IMAGE_URI'])
     print('Frontend:', c['FRONTEND_ORIGIN'])
 

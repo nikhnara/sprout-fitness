@@ -12,7 +12,7 @@ provider "google" {
   region = var.region
 }
 resource "google_project_service" "services" {
-  for_each = toset(["run.googleapis.com", "cloudbuild.googleapis.com", "artifactregistry.googleapis.com", "bigquery.googleapis.com", "firestore.googleapis.com", "storage.googleapis.com"])
+  for_each = toset(["run.googleapis.com", "cloudbuild.googleapis.com", "artifactregistry.googleapis.com", "bigquery.googleapis.com", "firestore.googleapis.com", "storage.googleapis.com", "secretmanager.googleapis.com", "iam.googleapis.com"])
   service = each.value
   disable_on_destroy = false
 }
@@ -28,12 +28,7 @@ resource "google_storage_bucket" "frontend" {
   versioning { enabled = true }
   depends_on = [google_project_service.services]
 }
-# Only compiled application assets go here. No diary exports, credentials or personal records.
-resource "google_storage_bucket_iam_member" "public_assets" {
-  bucket = google_storage_bucket.frontend.name
-  role = "roles/storage.objectViewer"
-  member = "allUsers"
-}
+# UI objects remain private; the frontend service serves their contents.
 resource "google_bigquery_dataset" "fitness" {
   dataset_id = "fitness"
   location = "US"

@@ -28,12 +28,19 @@ steps:
   - id: push-api
     name: gcr.io/cloud-builders/docker
     args: [push, '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/api:$COMMIT_SHA']
+  - id: build-web
+    name: gcr.io/cloud-builders/docker
+    args: [build, '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/web:$COMMIT_SHA', web]
+  - id: push-web
+    name: gcr.io/cloud-builders/docker
+    args: [push, '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/web:$COMMIT_SHA']
   - id: deploy-api-and-ui
     name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     entrypoint: python3
     args: [scripts/cloud_deploy.py, deploy]
     env: *deployment_env
 images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/web:$COMMIT_SHA'
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/api:$COMMIT_SHA'
 substitutions:
   _REGION: us-central1
