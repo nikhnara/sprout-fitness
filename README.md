@@ -4,7 +4,7 @@ A personal, mobile-first fitness and calorie tracker. Navy and lime dashboard, a
 
 ## Current status
 
-The frontend is functional and saves on this device. Cloud API, schema and deployment files are prepared, but **not deployed**. No Google Cloud project or GitHub repository has been connected. The avatar is generated from the three photos selected by the user. Raw photos are not included in the frontend. Browser visual QA is unverified because the environment's browser policy check was unavailable.
+The frontend is functional and saves on this device. Cloud API, schema and deployment files are prepared, but **not deployed**. Source is published to `nikhnara/sprout-fitness`. No Google Cloud project or Cloud Build trigger has been connected. The avatar is generated from the three photos selected by the user. Raw photos are not included in the frontend. Browser visual QA is unverified because the environment's browser policy check was unavailable.
 
 ### Run locally
 
@@ -75,7 +75,7 @@ Diet tags are conservative category/keyword heuristics, not ingredient-level gua
 
 ## GitHub
 
-Local Git history is initialized. Remote repository creation/push remains pending because the connected GitHub tools exposed no creation action and browser access was blocked. Suggested private repository: `sprout-fitness`. Do not commit credentials or personal diary exports. Once repository access is available, attach the remote and push `main`.
+Repository: [nikhnara/sprout-fitness](https://github.com/nikhnara/sprout-fitness). The app and pipeline are on `main`. Future releases use the Cloud Build workflow once its GCP connection is configured. Do not commit credentials or personal diary exports.
 
 ## Personal experience revision — October 7, 2026
 
