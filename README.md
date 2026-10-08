@@ -23,7 +23,11 @@ Open http://localhost:5173. No frontend package installation/build is required. 
 - JSON backup, single-owner Google sign-in, manual initial sync and automatic sync after signed-in edits once configured.
 - Firestore stores the latest diary; BigQuery stores timestamped JSON snapshots for analysis. Optimistic revisions protect against overwriting another device. Failed BigQuery exports remain in an outbox and retry on sync.
 
-## Cloud setup from scratch
+## Preferred deployment: GitHub first
+
+Push to `main` in `nikhnara/sprout-fitness`; Google Cloud Build fetches the commit, runs checks, deploys the API and publishes the GCS UI. See [the setup guide](docs/github-deployment.md). The pipeline is prepared; its cloud connection and first live deployment are pending. Do not use the local deploy script for normal releases.
+
+## Cloud setup from scratch (infrastructure reference)
 
 1. Create a new Google Cloud project and attach billing. Choose a budget alert. Send the project ID back to continue assisted deployment. Do not reuse another application's production project.
 2. Install Terraform if needed; authenticate your local Google Cloud CLI and application default credentials. Use a dedicated new project; the provided IAM roles are scoped to that project/dataset.

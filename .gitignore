@@ -9,3 +9,10 @@ node_modules/
 *credentials*.json
 *service-account*.json
 deployment.local.env
+
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json

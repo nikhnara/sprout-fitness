@@ -1,0 +1,46 @@
+# Trigger this config on pushes to ^main$ only, using sprout-build's service account.
+# Google Cloud fetches this repository; no GCP credentials are stored in GitHub.
+steps:
+  - id: validate-config
+    name: python:3.12-slim
+    entrypoint: python
+    args: [scripts/cloud_deploy.py, validate]
+    env: &deployment_env
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'REGION=${_REGION}'
+      - 'BUCKET_NAME=${_BUCKET_NAME}'
+      - 'OWNER_EMAIL=${_OWNER_EMAIL}'
+      - 'GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID}'
+      - 'FRONTEND_ORIGIN=${_FRONTEND_ORIGIN}'
+      - 'IMAGE_URI=${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/api:$COMMIT_SHA'
+      - 'DEPLOY_BRANCH=$BRANCH_NAME'
+  - id: frontend-checks
+    name: node:22-slim
+    entrypoint: bash
+    args: ['-ceu', 'node --check dist/app.js; node --test tests/*.test.mjs']
+  - id: backend-checks
+    name: python:3.12-slim
+    entrypoint: python
+    args: ['-m', unittest, discover, '-s', tests, '-p', 'test_*.py']
+  - id: build-api
+    name: gcr.io/cloud-builders/docker
+    args: [build, '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/api:$COMMIT_SHA', server]
+  - id: push-api
+    name: gcr.io/cloud-builders/docker
+    args: [push, '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/api:$COMMIT_SHA']
+  - id: deploy-api-and-ui
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: python3
+    args: [scripts/cloud_deploy.py, deploy]
+    env: *deployment_env
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/api:$COMMIT_SHA'
+substitutions:
+  _REGION: us-central1
+  _BUCKET_NAME: ''
+  _OWNER_EMAIL: ''
+  _GOOGLE_CLIENT_ID: ''
+  _FRONTEND_ORIGIN: ''
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1200s

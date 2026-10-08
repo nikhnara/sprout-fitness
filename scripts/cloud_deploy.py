@@ -1,0 +1,80 @@
+"""Cloud Build release entrypoint. Uses the build's short-lived service identity."""
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import tempfile
+from urllib.parse import urlparse
+
+
+def config(env):
+    required = ['PROJECT_ID', 'REGION', 'BUCKET_NAME', 'OWNER_EMAIL',
+                'GOOGLE_CLIENT_ID', 'FRONTEND_ORIGIN', 'IMAGE_URI', 'DEPLOY_BRANCH']
+    c = {k: env.get(k, '').strip() for k in required}
+    if any(not v for v in c.values()):
+        raise ValueError('Configure all deployment substitutions and use the main-branch trigger.')
+    if c['DEPLOY_BRANCH'] != 'main':
+        raise ValueError('Production deployment is restricted to main.')
+    if not re.fullmatch(r'[a-z][a-z0-9-]{4,28}[a-z0-9]', c['PROJECT_ID']):
+        raise ValueError('Invalid Google Cloud project ID.')
+    if not re.fullmatch(r'[a-z]+-[a-z]+[0-9]', c['REGION']):
+        raise ValueError('Invalid region.')
+    if not re.fullmatch(r'[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]', c['BUCKET_NAME']):
+        raise ValueError('Invalid bucket name.')
+    origin = urlparse(c['FRONTEND_ORIGIN'])
+    if origin.scheme != 'https' or not origin.hostname or origin.path or origin.query or origin.fragment or origin.username:
+        raise ValueError('FRONTEND_ORIGIN must be an HTTPS origin without a path or trailing slash.')
+    if origin.hostname in ('storage.googleapis.com', 'storage.cloud.google.com'):
+        raise ValueError('Use a dedicated HTTPS frontend origin for Google sign-in, not the shared GCS object origin.')
+    if not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', c['OWNER_EMAIL']):
+        raise ValueError('Invalid owner email.')
+    if not re.fullmatch(r'[A-Za-z0-9_-]+\.apps\.googleusercontent\.com', c['GOOGLE_CLIENT_ID']):
+        raise ValueError('Use a Google web OAuth client ID.')
+    expected = f"{c['REGION']}-docker.pkg.dev/{c['PROJECT_ID']}/sprout/api:"
+    if not c['IMAGE_URI'].startswith(expected) or not re.fullmatch(r'[a-f0-9]{40}', c['IMAGE_URI'][len(expected):]):
+        raise ValueError('Image must be tagged with the source commit in this project.')
+    return c
+
+
+def run(*args):
+    return subprocess.check_output(args, text=True).strip()
+
+
+def deploy(c):
+    settings = {'GOOGLE_CLOUD_PROJECT': c['PROJECT_ID'], 'OWNER_EMAIL': c['OWNER_EMAIL'],
+                'GOOGLE_CLIENT_ID': c['GOOGLE_CLIENT_ID'], 'ALLOWED_ORIGINS': c['FRONTEND_ORIGIN'],
+                'BIGQUERY_TABLE': c['PROJECT_ID'] + '.fitness.events'}
+    with tempfile.TemporaryDirectory() as directory:
+        env_file = Path(directory) / 'runtime.json'
+        env_file.write_text(json.dumps(settings))
+        run('gcloud', 'run', 'deploy', 'sprout-api', '--image', c['IMAGE_URI'],
+            '--project', c['PROJECT_ID'], '--region', c['REGION'],
+            '--service-account', f"sprout-api@{c['PROJECT_ID']}.iam.gserviceaccount.com",
+            '--env-vars-file', str(env_file), '--allow-unauthenticated',
+            '--max-instances', '2', '--memory', '512Mi', '--quiet')
+    api = run('gcloud', 'run', 'services', 'describe', 'sprout-api', '--project', c['PROJECT_ID'],
+              '--region', c['REGION'], '--format=value(status.url)')
+    if not api.startswith('https://'):
+        raise ValueError('Cloud Run did not return a valid HTTPS URL.')
+    Path('dist/config.js').write_text('window.SPROUT_CONFIG = ' + json.dumps({
+        'apiUrl': api, 'googleClientId': c['GOOGLE_CLIENT_ID']}) + ';\n')
+    # Upload the entry point last. Assets use no-cache until content hashing is introduced.
+    bucket = 'gs://' + c['BUCKET_NAME']
+    run('gcloud', 'storage', 'rsync', 'dist', bucket, '--recursive',
+        '--exclude=^index\\.html$', '--cache-control=no-cache', '--project', c['PROJECT_ID'])
+    run('gcloud', 'storage', 'cp', 'dist/index.html', bucket + '/index.html',
+        '--cache-control=no-cache', '--project', c['PROJECT_ID'])
+    print('Deployed commit image:', c['IMAGE_URI'])
+    print('Frontend:', c['FRONTEND_ORIGIN'])
+
+
+if __name__ == '__main__':
+    settings = config(os.environ)
+    if sys.argv[1:] == ['deploy']:
+        deploy(settings)
+    elif sys.argv[1:] == ['validate']:
+        print('Deployment configuration validated.')
+    else:
+        raise SystemExit('Usage: cloud_deploy.py validate|deploy')
