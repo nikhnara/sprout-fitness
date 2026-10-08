@@ -4,7 +4,7 @@ A personal, mobile-first fitness and calorie tracker. Navy and lime dashboard, a
 
 ## Current status
 
-The frontend is functional and saves on this device. Cloud API, schema and deployment files are prepared, but **not deployed**. No Google Cloud project or GitHub repository has been connected. The companion is a starter character, not a personal likeness. Browser visual QA is unverified because the environment's browser policy check was unavailable.
+The frontend is functional and saves on this device. Cloud API, schema and deployment files are prepared, but **not deployed**. No Google Cloud project or GitHub repository has been connected. The avatar is generated from the three photos selected by the user. Raw photos are not included in the frontend. Browser visual QA is unverified because the environment's browser policy check was unavailable.
 
 ### Run locally
 
@@ -55,13 +55,13 @@ Diet tags are conservative category/keyword heuristics, not ingredient-level gua
 - Preview and browser interactions were not visually verified due to browser access restrictions. Node calculation/catalog tests and Python request-validation tests are included.
 - The JSON snapshot API has an 800 KB limit; a larger long-term diary needs per-day event storage before this ceiling. The UI does not silently delete history.
 - Sync is device-first with explicit conflict handling; it does not automatically merge concurrent device edits. Export local changes before restoring cloud state. Failed BigQuery writes retry when the app next syncs; no unattended retry scheduler is deployed.
-- A companion image with animation provides a dimensional look; this is not a rigged 3D avatar editor. Personal avatar customization remains a future step.
+- A companion image with animation provides a dimensional look; this is not a rigged 3D avatar editor. The current avatar is a generated likeness, displayed as a layered image.
 - WebMCP exposes a feature-detected read-only daily summary, but runtime validation was unavailable.
 - Google Fonts loads from its CDN, with system fallbacks. No analytics or advertising scripts.
 
 ## Checks
 
-`node --test tests/core.test.mjs`
+`node --test tests/*.test.mjs`
 
 `python3 -m unittest discover -s tests -p 'test_*.py'`
 
@@ -84,3 +84,13 @@ Chana curry and latte presets carry explicit estimate labels from the user's sup
 Training includes a draft no-door-anchor upper/lower split, a three-day full-body fallback, and 12-week progression guidance. HASfit source: https://hasfit.com/workouts/home/strength-weight-training/full-body-resistance-band-workout/. General activity source: https://www.cdc.gov/physical-activity-basics/guidelines/adults.html. This is not a guaranteed-results or personalized clinical program.
 
 Validation: seven JavaScript nutrition/catalog/preset tests and five Python validation tests pass. Browser access was retried and remains blocked by the unavailable admin-policy check, so visual and interaction QA remain unverified. GCS, BigQuery and remote GitHub deployment remain pending as before.
+
+## Food studio revision — October 8, 2026
+
+Separate food illustrations are wired for chana, rice, dry oats, cooked oatmeal, dal, rajma, roti, idli, dosa, curd, paneer, dry soya, butter, ghee and oil. The generated poha asset is reserved until a suitable nutrient source is added. Images are illustrative and do not determine nutrients. The earlier combined chana/rice image appears only on the combination preset.
+
+Seven recipe templates expose editable ingredient grams, cooking-fat shortcuts, and finished batch yield. All dish templates are estimates, not authoritative measurements of a cooked dish. The meal tray recalculates on each valid keystroke and blocks logging invalid weights. Saved entries retain nutrient snapshots.
+
+Paneer: Amul Malai manufacturer's label (323 kcal, 20 g protein, 25 g fat, 4.5 g carbs per 100 g; unquantified fiber remains null). Soya: Bon Vegan dry chunks, manufacturer catalogue page 33. The EU label's 27 g available carbohydrate and 8.8 g fiber are combined to approximate USDA total-carbohydrate reporting; this is documented in the food note. This is not a verified Nutrela record.
+
+Checks: 10 JavaScript tests and 5 Python validation tests pass. First review covered portion scaling, oil additions, cooked yield, missing values and invalid quantities. Second source review covered separate image paths, touch targets, small-screen rules, sources and reduced motion. Actual rendered desktop/mobile visual and interaction reviews remain blocked by the browser security-policy check. GCS, BigQuery, and remote GitHub remain unconnected.
