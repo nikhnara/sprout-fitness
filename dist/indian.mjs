@@ -16,7 +16,7 @@ export function indianCatalog(catalog){
  const recipe=(id,name,img,weight,portion,items)=>{
   if(items.some(([id])=>!map.has(id)))return null;
   const ingredients=items.map(([id,grams])=>({food:structuredClone(map.get(id)),grams}));
-  return {id:'template-'+id,name:name+' · editable recipe',displayName:name,aliases:name,diet:ingredients.some(x=>x.food.diet==='dairy')?'dairy':'plant',image:picture(img),source:'Modeled recipe · ingredient records',basisGrams:100,batchGrams:weight,defaultGrams:portion,estimated:true,ingredients,portions:[{label:'Example serving',grams:portion}],note:'Example recipe, not a measured dish. Tap “Customize recipe” to set your ingredient amounts and finished cooked batch weight. Nutrition includes the listed oil; do not add that same oil twice.',nutrients:recipeNutrition(ingredients,weight)};
+  return {id:'template-'+id,name:name+' · editable recipe',displayName:name,aliases:name,diet:ingredients.some(x=>x.food.diet==='dairy')?'dairy':'plant',...(img?{image:picture(img)}:{emoji:'🥘'}),source:'Modeled recipe · ingredient records',basisGrams:100,batchGrams:weight,defaultGrams:portion,estimated:true,ingredients,portions:[{label:'Example serving',grams:portion}],note:'Example recipe, not a measured dish. Tap “Customize recipe” to set your ingredient amounts and finished cooked batch weight. Nutrition includes the listed oil; do not add that same oil twice.',nutrients:recipeNutrition(ingredients,weight)};
  };
  const templates=[
  recipe('chana','Chana masala','chana',650,250,[['173757',400],['170457',120],['170000',80],['172336',10],['170924',5]]),
@@ -25,7 +25,15 @@ export function indianCatalog(catalog){
  recipe('roti','Roti · no added fat','roti',160,40,[['168893',100]]),
  recipe('oatmeal','Oatmeal · cooked with water','oatmeal',250,250,[['169705',50]]),
  recipe('idli','Idli · rice & urad','idli',600,150,[['168931',150],['174259',50]]),
- recipe('dosa','Dosa · rice & urad','dosa',450,150,[['168931',150],['174259',50],['172336',10]])
+ recipe('dosa','Dosa · rice & urad','dosa',450,150,[['168931',150],['174259',50],['172336',10]]),
+ recipe('paneer-bhurji','Paneer bhurji','paneer',430,180,[['brand-amul-paneer',200],['170457',120],['170000',80],['172336',10]]),
+ recipe('palak-paneer','Palak paneer','paneer',600,200,[['brand-amul-paneer',200],['168462',250],['170457',100],['170000',80],['172336',10]]),
+ recipe('soya-masala','Soya masala','soya',500,200,[['brand-bon-soya',80],['170457',150],['170000',80],['172336',10]]),
+ recipe('khichdi','Rice & lentil khichdi','dal',650,250,[['168931',100],['172436',70],['173412',8]]),
+ recipe('aloo-gobi','Aloo gobi',null,550,200,[['170026',250],['169986',300],['170000',70],['172336',12]]),
+ recipe('bhindi','Bhindi masala',null,400,150,[['169260',350],['170000',80],['170457',80],['172336',12]]),
+ recipe('pulao','Vegetable pulao','rice',700,250,[['168931',150],['170419',100],['169986',100],['170000',60],['172336',10]]),
+ recipe('curd-rice','Curd rice','rice',450,200,[['168878',250],['171284',180],['172336',5]])
  ].filter(Boolean);
  return {extras:[...extras,...templates],favorites:[...templates,...extras],templates};
 }

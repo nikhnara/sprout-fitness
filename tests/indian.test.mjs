@@ -22,6 +22,6 @@ test('recipe unknowns and invalid amounts cannot silently become zeros',()=>{
 });
 test('requested staples and standalone illustrations resolve',()=>{
  for(const term of ['rice','oats','curd','butter','ghee','oil','paneer','soya'])assert.ok(catalog.extras.some(f=>(f.displayName||f.name).toLowerCase().includes(term)));
- for(const f of catalog.extras){assert.ok(existsSync(new URL('../dist/'+f.image,import.meta.url)));assert.equal(f.basisGrams,100);assert.ok(f.source);}
+ for(const f of catalog.extras){if(f.image)assert.ok(existsSync(new URL('../dist/'+f.image,import.meta.url)));else assert.ok(f.emoji);assert.equal(f.basisGrams,100);assert.ok(f.source);}
  assert.ok(catalog.templates.every(f=>f.estimated&&f.ingredients.length&&f.batchGrams>0));
 });

@@ -9,8 +9,7 @@ def owner_from_bearer(header, owner_email, verify):
         raise ValueError('Invalid bearer token.')
     claims = verify(token)
     if (claims.get('email_verified') is not True
-            or not owner_email
-            or claims.get('email', '').casefold() != owner_email.casefold()
+            or (owner_email and claims.get('email', '').casefold() != owner_email.casefold())
             or claims.get('firebase', {}).get('sign_in_provider') != 'google.com'):
         raise ValueError('Sign in with the owner Google account.')
     uid = claims.get('uid')

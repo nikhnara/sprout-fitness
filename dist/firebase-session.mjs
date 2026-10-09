@@ -4,7 +4,7 @@ export function sessionFromSdk(auth,sdk,onChange){
  return {
   signIn(){const provider=new sdk.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});return sdk.signInWithPopup(auth,provider);},
   signOut(){return sdk.signOut(auth);},
-  async idToken(){const user=auth.currentUser;if(!user)throw Error('Sign in before syncing your diary.');return user.getIdToken();},
+  async idToken(expectedUid){const user=auth.currentUser;if(!user||(expectedUid&&user.uid!==expectedUid))throw Error('Your session changed. Please sign in again.');const token=await user.getIdToken();if(auth.currentUser?.uid!==user.uid)throw Error('Your session changed. Please sign in again.');return token;},
   dispose:unsubscribe
  };
 }

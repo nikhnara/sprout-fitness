@@ -60,7 +60,7 @@ def run(*args):
 
 
 def deploy(c):
-    settings = {'GOOGLE_CLOUD_PROJECT': c['PROJECT_ID'], 'OWNER_EMAIL': c['OWNER_EMAIL'],
+    settings = {'AUTH_MODE': 'multi', 'GOOGLE_CLOUD_PROJECT': c['PROJECT_ID'], 'OWNER_EMAIL': c['OWNER_EMAIL'],
                 'ALLOWED_ORIGINS': c['FRONTEND_ORIGIN'], 'FIREBASE_PROJECT_ID': c['firebase']['projectId'],
                 'BIGQUERY_TABLE': c['PROJECT_ID'] + '.fitness.events'}
     with tempfile.TemporaryDirectory() as directory:
@@ -80,7 +80,7 @@ def deploy(c):
     # Upload the entry point last. Assets use no-cache until content hashing is introduced.
     bucket = 'gs://' + c['BUCKET_NAME']
     run('gcloud', 'storage', 'rsync', 'dist', bucket, '--recursive',
-        '--exclude=^index\\.html$', '--cache-control=no-cache', '--project', c['PROJECT_ID'])
+        r'--exclude=^index\.html$', '--cache-control=no-cache', '--project', c['PROJECT_ID'])
     run('gcloud', 'storage', 'cp', 'dist/index.html', bucket + '/index.html',
         '--cache-control=no-cache', '--project', c['PROJECT_ID'])
     web_image = c['IMAGE_URI'].replace('/sprout/api:', '/sprout/web:')

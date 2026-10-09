@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {storageKey,diaryCsv,periodRows,avatar,poses,safeLink} from '../dist/gamna.mjs';
+test('device storage never shares a key between accounts',()=>{assert.notEqual(storageKey('a'),storageKey('b'));assert.throws(()=>storageKey(''));});
+test('CSV preserves unknown nutrients, escapes quotes and blocks spreadsheet formulas',()=>{const csv=diaryCsv({days:{'2026-10-09':{weight:null,sleep:7,exercise:[],meals:[{name:'=HYPERLINK("evil")',meal:'Lunch',grams:100,nutrients:{kcal:1,protein:null,fat:0,carbs:0,fiber:0}}]}}});assert.ok(csv.includes("'=HYPERLINK"));assert.ok(csv.includes('""evil""'));assert.ok(csv.includes('"100","1","","0"'));});
+test('progress preserves blank dates and excludes incomplete nutrients',()=>{const rows=periodRows({'2026-10-09':{weight:80,sleep:null,exercise:[],meals:[{nutrients:{kcal:null,protein:4}}]}},'2026-10-09',7);assert.equal(rows.length,7);assert.equal(rows[0].weight,null);assert.equal(rows.at(-1).kcal,null);assert.equal(rows.at(-1).protein,4);});
+test('avatar has twelve poses and rejects unsafe photo URLs',()=>{assert.equal(poses.length,12);assert.equal(new Set(poses).size,12);assert.ok(!avatar(1,'javascript:alert(1)').includes('javascript:'));assert.equal(safeLink('javascript:alert(1)'),'#');});

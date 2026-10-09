@@ -39,6 +39,11 @@ resource "google_storage_bucket_iam_member" "build_assets" {
   role = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.build.email}"
 }
+resource "google_storage_bucket_iam_member" "build_bucket_metadata" {
+  bucket = google_storage_bucket.frontend.name
+  role = "roles/storage.legacyBucketReader"
+  member = "serviceAccount:${google_service_account.build.email}"
+}
 resource "google_cloudbuild_trigger" "main" {
   count = var.github_repository_resource == "" ? 0 : 1
   name = "sprout-main"
@@ -56,7 +61,7 @@ resource "google_cloudbuild_trigger" "main" {
     _FIREBASE_CONFIG = var.firebase_config
     _FRONTEND_ORIGIN = var.frontend_origin
   }
-  depends_on = [google_project_iam_member.build_roles, google_service_account_iam_member.build_runtime, google_artifact_registry_repository_iam_member.build_images, google_storage_bucket_iam_member.build_assets, google_storage_bucket_iam_member.web_assets, google_service_account_iam_member.build_web]
+  depends_on = [google_storage_bucket_iam_member.build_bucket_metadata, google_project_iam_member.build_roles, google_service_account_iam_member.build_runtime, google_artifact_registry_repository_iam_member.build_images, google_storage_bucket_iam_member.build_assets, google_storage_bucket_iam_member.web_assets, google_service_account_iam_member.build_web]
 }
 output "build_service_account" { value = google_service_account.build.email }
 
