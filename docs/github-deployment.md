@@ -10,17 +10,17 @@ The production source of truth is `main`. Google Cloud fetches commits through i
 
 1. Push or merge changes into `main`.
 2. Cloud Build validates its configuration, runs JavaScript and Python tests, builds the API container, and pushes an image tagged with the full Git commit SHA.
-3. It builds the HTTPS frontend container and deploys the API image to Cloud Run using the separate `sprout-api` runtime identity.
+3. It builds the HTTPS frontend container and deploys the API image to Cloud Run using the separate `gamna-396` runtime identity.
 4. It generates the public frontend configuration in the build workspace, uploads frontend assets to GCS, then uploads `index.html` last and deploys the HTTPS frontend. It never commits generated cloud configuration back to Git.
 5. BigQuery and Firestore are provisioned once, not recreated on every release. Diary JSON stays in private backend storage, outside the frontend bucket and Git repository.
 
 ## One-time setup reference
 
-- Resources were created manually. Do not apply Terraform over them without importing them first. The `infra/` files describe the intended resources; they have not been imported or validated against live state. It creates the existing storage/API prerequisites plus an Artifact Registry repository and `sprout-build` service account.
+- Resources were created manually. Do not apply Terraform over them without importing them first. The `infra/` files describe the intended resources; they have not been imported or validated against live state. It creates the existing storage/API prerequisites plus an Artifact Registry repository and `gamna-666` service account.
 - No purchased domain is required. The pipeline deploys `sprout-web`, a small Cloud Run service reading UI assets from the private GCS bucket. Planned HTTPS origin: `https://sprout-web-5993706635.us-central1.run.app`. Verify this origin after deployment. Its runtime identity can read only the UI bucket; it cannot read diary storage.
 - Enable Google login in Firebase Authentication, add the actual frontend hostname to authorized domains, and provide the public Firebase web configuration through `_FIREBASE_CONFIG`. Set the diary owner email in `_OWNER_EMAIL`.
 - In Cloud Build, create a GitHub connection in `us-central1`, authorize the Google GitHub app for this repository only, then link the repository. Copy its full resource: `projects/PROJECT/locations/us-central1/connections/CONNECTION/repositories/REPOSITORY`.
-- Supply `github_repository_resource`, `owner_email`, `firebase_config`, and `frontend_origin` to Terraform. Its `sprout-main` trigger watches `^main$`, uses `cloudbuild.yaml`, and runs as `sprout-build`. Leave the repository resource empty until the other setup is ready; no trigger is created in that case.
+- Supply `github_repository_resource`, `owner_email`, `firebase_config`, and `frontend_origin` to Terraform. Its `sprout-main` trigger watches `^main$`, uses `cloudbuild.yaml`, and runs as `gamna-666`. Leave the repository resource empty until the other setup is ready; no trigger is created in that case.
 - Run the trigger once against the committed main branch. Then validate owner sign-in, saving, BigQuery JSON ingestion, restore, and conflict protection. A successful build alone does not verify the full diary flow.
 
 The build identity has Cloud Run admin and logging writer at project scope, Artifact Registry writer on the Sprout repository, object admin on the frontend bucket, and permission to act as the API and frontend runtime identities. Cloud Run is publicly reachable but every diary route verifies the owner's Firebase ID token. The Cloud Build connection uses Google's managed authorization; no downloaded account key is needed.
@@ -54,3 +54,13 @@ Requested production domain: `gamna.app`. DNS and HTTPS connection are not confi
 Use the checked-in `_FIREBASE_CONFIG` default (public Firebase web identifiers) and `_REGION=us-central1`. Set `_BUCKET_NAME=sprout-fitness-ui`, `_OWNER_EMAIL` to the owner's Google account, and `_FRONTEND_ORIGIN=https://gamna.app`. Firebase Authentication belongs to `sprout-fitness-1eb7f`; resource operations and Cloud Build belong to `sprout-fitness`. Do not replace the Firebase `authDomain` with `gamna.app` just because the site domain changed; the auth helper hosting would also need configuration.
 
 Adding `gamna.app` to Firebase authorized domains is not a DNS or TLS setup. Domain routing through Cloudflare remains to be configured. The first build may be used to create the Cloud Run services; live login and API calls must be tested from the configured frontend origin after domain setup. No analytics SDK is loaded even though the public config includes a measurement ID.
+
+## Actual account IDs (confirmed from the user's console)
+
+| Role | Service account email | Display name |
+| --- | --- | --- |
+| Build | gamna-666@sprout-fitness.iam.gserviceaccount.com | gamna-build |
+| API runtime | gamna-396@sprout-fitness.iam.gserviceaccount.com | gamna-api |
+| Web runtime | sprout-web@sprout-fitness.iam.gserviceaccount.com | gamna-web |
+
+Cloud Run service names remain `sprout-api` and `sprout-web`; these are distinct from service account IDs. Keep the trigger running as `gamna-666`. Grant that principal Service Account User on both `gamna-396` and `sprout-web`. Display-name changes do not change service account email addresses. Infrastructure files are only a reference until the manually created resources are imported; do not apply them to create duplicates.

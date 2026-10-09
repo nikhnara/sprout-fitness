@@ -1,4 +1,4 @@
-# Trigger this config on pushes to ^main$ only, using sprout-build's service account.
+# Trigger this config on pushes to ^main$ only, using gamna-666's service account.
 # Google Cloud fetches this repository; no GCP credentials are stored in GitHub.
 steps:
   - id: validate-config

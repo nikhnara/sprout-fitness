@@ -61,8 +61,8 @@ resource "google_firestore_database" "diary" {
   depends_on = [google_project_service.services]
 }
 resource "google_service_account" "api" {
-  account_id = "sprout-api"
-  display_name = "Sprout diary API"
+  account_id = "gamna-396"
+  display_name = "gamna-api"
 }
 resource "google_bigquery_dataset_iam_member" "writer" {
   dataset_id = google_bigquery_dataset.fitness.dataset_id

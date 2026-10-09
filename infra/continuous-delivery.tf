@@ -14,8 +14,8 @@ resource "google_artifact_registry_repository" "images" {
   depends_on = [google_project_service.services]
 }
 resource "google_service_account" "build" {
-  account_id = "sprout-build"
-  display_name = "Sprout GitHub deployment"
+  account_id = "gamna-666"
+  display_name = "gamna-build"
 }
 resource "google_project_iam_member" "build_roles" {
   for_each = toset(["roles/run.admin", "roles/logging.logWriter"])
@@ -62,7 +62,7 @@ output "build_service_account" { value = google_service_account.build.email }
 
 resource "google_service_account" "web" {
   account_id = "sprout-web"
-  display_name = "Sprout HTTPS frontend"
+  display_name = "gamna-web"
 }
 resource "google_storage_bucket_iam_member" "web_assets" {
   bucket = google_storage_bucket.frontend.name

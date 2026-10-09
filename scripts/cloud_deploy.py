@@ -68,7 +68,7 @@ def deploy(c):
         env_file.write_text(json.dumps(settings))
         run('gcloud', 'run', 'deploy', 'sprout-api', '--image', c['IMAGE_URI'],
             '--project', c['PROJECT_ID'], '--region', c['REGION'],
-            '--service-account', f"sprout-api@{c['PROJECT_ID']}.iam.gserviceaccount.com",
+            '--service-account', f"gamna-396@{c['PROJECT_ID']}.iam.gserviceaccount.com",
             '--env-vars-file', str(env_file), '--allow-unauthenticated',
             '--max-instances', '2', '--memory', '512Mi', '--quiet')
     api = run('gcloud', 'run', 'services', 'describe', 'sprout-api', '--project', c['PROJECT_ID'],
