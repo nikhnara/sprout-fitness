@@ -1,15 +1,16 @@
 """Single-owner authenticated diary API; Firestore snapshots and BigQuery JSON audit events."""
 import datetime, hashlib, json, os, re
 from flask import Flask, request, jsonify
-from google.auth.transport import requests as google_requests
-from google.oauth2 import id_token
+import firebase_admin
+from firebase_admin import auth as firebase_auth
+from auth_policy import owner_from_bearer
 from google.cloud import bigquery, firestore
 from validation import validate_state
 
 app=Flask(__name__)
 app.config['MAX_CONTENT_LENGTH']=1_000_000
 PROJECT=os.environ['GOOGLE_CLOUD_PROJECT']
-CLIENT_ID=os.environ['GOOGLE_CLIENT_ID']
+firebase_admin.initialize_app(options={'projectId': os.environ['FIREBASE_PROJECT_ID']})
 OWNER=os.environ['OWNER_EMAIL'].lower()
 ORIGINS=set(os.environ['ALLOWED_ORIGINS'].split(','))
 TABLE=os.environ.get('BIGQUERY_TABLE',f'{PROJECT}.fitness.events')
@@ -23,10 +24,7 @@ def guard():
     if origin and origin not in ORIGINS: return jsonify(error='Origin not allowed.'),403
     if request.method=='OPTIONS': return '',204
     try:
-        token=request.headers.get('Authorization','').removeprefix('Bearer ')
-        info=id_token.verify_oauth2_token(token,google_requests.Request(),CLIENT_ID)
-        if not info.get('email_verified') or info.get('email','').lower()!=OWNER: raise ValueError()
-        request.owner=hashlib.sha256(info['sub'].encode()).hexdigest()
+        request.owner=owner_from_bearer(request.headers.get('Authorization'), OWNER, firebase_auth.verify_id_token)
     except Exception: return jsonify(error='Sign in with the owner Google account to continue.'),401
 
 @app.after_request

@@ -10,7 +10,7 @@ steps:
       - 'REGION=${_REGION}'
       - 'BUCKET_NAME=${_BUCKET_NAME}'
       - 'OWNER_EMAIL=${_OWNER_EMAIL}'
-      - 'GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID}'
+      - 'FIREBASE_CONFIG=${_FIREBASE_CONFIG}'
       - 'FRONTEND_ORIGIN=${_FRONTEND_ORIGIN}'
       - 'IMAGE_URI=${_REGION}-docker.pkg.dev/$PROJECT_ID/sprout/api:$COMMIT_SHA'
       - 'DEPLOY_BRANCH=$BRANCH_NAME'
@@ -46,8 +46,8 @@ substitutions:
   _REGION: us-central1
   _BUCKET_NAME: ''
   _OWNER_EMAIL: ''
-  _GOOGLE_CLIENT_ID: ''
-  _FRONTEND_ORIGIN: ''
+  _FIREBASE_CONFIG: '{"apiKey":"AIzaSyD79ynFHeN03sBz_3zOB9WrgevcPETiLbc","authDomain":"sprout-fitness-1eb7f.firebaseapp.com","projectId":"sprout-fitness-1eb7f","storageBucket":"sprout-fitness-1eb7f.firebasestorage.app","messagingSenderId":"316782184589","appId":"1:316782184589:web:08fd948e6859066e81bac4","measurementId":"G-PVF0VJPMNY"}'
+  _FRONTEND_ORIGIN: 'https://gamna.app'
 options:
   logging: CLOUD_LOGGING_ONLY
 timeout: 1200s

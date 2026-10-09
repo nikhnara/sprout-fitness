@@ -6,5 +6,5 @@ bucket_name = "sprout-fitness-ui"
 # Leave empty until the GitHub connection, OAuth client and HTTPS origin are ready.
 github_repository_resource = ""
 owner_email = ""
-google_client_id = ""
-frontend_origin = "https://sprout-web-5993706635.us-central1.run.app"
+firebase_config = ""
+frontend_origin = "https://gamna.app"

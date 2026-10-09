@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 def config(env):
     required = ['PROJECT_ID', 'REGION', 'BUCKET_NAME', 'OWNER_EMAIL',
-                'GOOGLE_CLIENT_ID', 'FRONTEND_ORIGIN', 'IMAGE_URI', 'DEPLOY_BRANCH']
+                'FIREBASE_CONFIG', 'FRONTEND_ORIGIN', 'IMAGE_URI', 'DEPLOY_BRANCH']
     c = {k: env.get(k, '').strip() for k in required}
     if any(not v for v in c.values()):
         raise ValueError('Configure all deployment substitutions and use the main-branch trigger.')
@@ -30,8 +30,21 @@ def config(env):
         raise ValueError('Use a dedicated HTTPS frontend origin for Google sign-in, not the shared GCS object origin.')
     if not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', c['OWNER_EMAIL']):
         raise ValueError('Invalid owner email.')
-    if not re.fullmatch(r'[A-Za-z0-9_-]+\.apps\.googleusercontent\.com', c['GOOGLE_CLIENT_ID']):
-        raise ValueError('Use a Google web OAuth client ID.')
+    try:
+        firebase = json.loads(c['FIREBASE_CONFIG'])
+    except (ValueError, TypeError):
+        raise ValueError('FIREBASE_CONFIG must be the Firebase web configuration JSON.')
+    allowed = {'apiKey', 'authDomain', 'projectId', 'appId', 'storageBucket', 'messagingSenderId', 'measurementId', 'databaseURL'}
+    if not isinstance(firebase, dict) or not set(firebase).issubset(allowed):
+        raise ValueError('Use only the public Firebase web configuration; no credentials.')
+    for field in ['apiKey', 'authDomain', 'projectId', 'appId']:
+        if not isinstance(firebase.get(field), str) or not firebase[field].strip():
+            raise ValueError('Firebase web config is missing ' + field)
+    if not re.fullmatch(r'[a-z][a-z0-9-]{4,28}[a-z0-9]', firebase['projectId']):
+        raise ValueError('Invalid Firebase project ID.')
+    if not re.fullmatch(r'[a-zA-Z0-9.-]+', firebase['authDomain']):
+        raise ValueError('Firebase authDomain must be a hostname.')
+    c['firebase'] = firebase
     expected = f"{c['REGION']}-docker.pkg.dev/{c['PROJECT_ID']}/sprout/api:"
     if not c['IMAGE_URI'].startswith(expected) or not re.fullmatch(r'[a-f0-9]{40}', c['IMAGE_URI'][len(expected):]):
         raise ValueError('Image must be tagged with the source commit in this project.')
@@ -44,7 +57,7 @@ def run(*args):
 
 def deploy(c):
     settings = {'GOOGLE_CLOUD_PROJECT': c['PROJECT_ID'], 'OWNER_EMAIL': c['OWNER_EMAIL'],
-                'GOOGLE_CLIENT_ID': c['GOOGLE_CLIENT_ID'], 'ALLOWED_ORIGINS': c['FRONTEND_ORIGIN'],
+                'ALLOWED_ORIGINS': c['FRONTEND_ORIGIN'], 'FIREBASE_PROJECT_ID': c['firebase']['projectId'],
                 'BIGQUERY_TABLE': c['PROJECT_ID'] + '.fitness.events'}
     with tempfile.TemporaryDirectory() as directory:
         env_file = Path(directory) / 'runtime.json'
@@ -59,7 +72,7 @@ def deploy(c):
     if not api.startswith('https://'):
         raise ValueError('Cloud Run did not return a valid HTTPS URL.')
     Path('dist/config.js').write_text('window.SPROUT_CONFIG = ' + json.dumps({
-        'apiUrl': api, 'googleClientId': c['GOOGLE_CLIENT_ID']}) + ';\n')
+        'apiUrl': api, 'firebase': c['firebase']}) + ';\n')
     # Upload the entry point last. Assets use no-cache until content hashing is introduced.
     bucket = 'gs://' + c['BUCKET_NAME']
     run('gcloud', 'storage', 'rsync', 'dist', bucket, '--recursive',

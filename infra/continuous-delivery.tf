@@ -5,7 +5,7 @@ variable "github_repository_resource" {
   default = ""
 }
 variable "owner_email" { default = "" }
-variable "google_client_id" { default = "" }
+variable "firebase_config" { default = "" }
 variable "frontend_origin" { default = "" }
 resource "google_artifact_registry_repository" "images" {
   location = var.region
@@ -53,7 +53,7 @@ resource "google_cloudbuild_trigger" "main" {
     _REGION = var.region
     _BUCKET_NAME = var.bucket_name
     _OWNER_EMAIL = var.owner_email
-    _GOOGLE_CLIENT_ID = var.google_client_id
+    _FIREBASE_CONFIG = var.firebase_config
     _FRONTEND_ORIGIN = var.frontend_origin
   }
   depends_on = [google_project_iam_member.build_roles, google_service_account_iam_member.build_runtime, google_artifact_registry_repository_iam_member.build_images, google_storage_bucket_iam_member.build_assets, google_storage_bucket_iam_member.web_assets, google_service_account_iam_member.build_web]

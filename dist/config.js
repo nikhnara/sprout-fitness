@@ -1,2 +1,2 @@
-// Public configuration only. Service-account credentials never belong in this file.
-window.SPROUT_CONFIG = { apiUrl: '', googleClientId: '' };
+// Public Firebase identifiers; the Cloud Build release fills in apiUrl.
+window.SPROUT_CONFIG = {"apiUrl": "", "firebase": {"apiKey": "AIzaSyD79ynFHeN03sBz_3zOB9WrgevcPETiLbc", "authDomain": "sprout-fitness-1eb7f.firebaseapp.com", "projectId": "sprout-fitness-1eb7f", "storageBucket": "sprout-fitness-1eb7f.firebasestorage.app", "messagingSenderId": "316782184589", "appId": "1:316782184589:web:08fd948e6859066e81bac4", "measurementId": "G-PVF0VJPMNY"}};

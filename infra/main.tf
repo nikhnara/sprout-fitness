@@ -18,7 +18,7 @@ resource "google_project_service" "services" {
 }
 resource "google_storage_bucket" "frontend" {
   name = var.bucket_name
-  location = "US"
+  location = "US-CENTRAL1"
   uniform_bucket_level_access = true
   force_destroy = false
   website {
