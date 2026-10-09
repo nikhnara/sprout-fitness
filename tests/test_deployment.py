@@ -30,3 +30,7 @@ class DeploymentConfigTests(unittest.TestCase):
         parsed = module.config({**self.env, 'FIREBASE_CONFIG': json.dumps(firebase)})
         self.assertEqual(parsed['PROJECT_ID'], 'sprout-example')
         self.assertEqual(parsed['firebase']['projectId'], 'separate-auth-project')
+
+    def test_missing_values_name_the_trigger_settings(self):
+        with self.assertRaisesRegex(ValueError, r'Missing deployment settings: _BUCKET_NAME, _OWNER_EMAIL'):
+            module.config({**self.env, 'BUCKET_NAME': '', 'OWNER_EMAIL': '   '})

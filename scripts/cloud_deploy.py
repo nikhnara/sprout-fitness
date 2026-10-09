@@ -13,8 +13,12 @@ def config(env):
     required = ['PROJECT_ID', 'REGION', 'BUCKET_NAME', 'OWNER_EMAIL',
                 'FIREBASE_CONFIG', 'FRONTEND_ORIGIN', 'IMAGE_URI', 'DEPLOY_BRANCH']
     c = {k: env.get(k, '').strip() for k in required}
-    if any(not v for v in c.values()):
-        raise ValueError('Configure all deployment substitutions and use the main-branch trigger.')
+    missing = [key for key, value in c.items() if not value]
+    if missing:
+        names = {'REGION': '_REGION', 'BUCKET_NAME': '_BUCKET_NAME', 'OWNER_EMAIL': '_OWNER_EMAIL',
+                 'FIREBASE_CONFIG': '_FIREBASE_CONFIG', 'FRONTEND_ORIGIN': '_FRONTEND_ORIGIN',
+                 'DEPLOY_BRANCH': 'BRANCH_NAME (run the main-branch trigger)'}
+        raise ValueError('Missing deployment settings: ' + ', '.join(names.get(key, key) for key in missing))
     if c['DEPLOY_BRANCH'] != 'main':
         raise ValueError('Production deployment is restricted to main.')
     if not re.fullmatch(r'[a-z][a-z0-9-]{4,28}[a-z0-9]', c['PROJECT_ID']):
