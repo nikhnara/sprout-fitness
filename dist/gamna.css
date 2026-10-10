@@ -15,3 +15,5 @@
 .gamna-avatar.rendered-companion{display:inline-block;aspect-ratio:3/4;background-image:url(assets/gamna-poses-v2.png);background-size:400% 300%;background-repeat:no-repeat;max-width:100%}
 
 .profile-photo{width:72px;height:72px;object-fit:cover;border-radius:50%;margin-top:12px}.gamna-avatar.rendered-companion{aspect-ratio:1/1}
+
+.gamna-avatar.rendered-companion{height:auto!important;margin-inline:auto}
