@@ -56,7 +56,11 @@ def config(env):
 
 
 def run(*args):
-    return subprocess.check_output(args, text=True).strip()
+    try:
+        return subprocess.check_output(args, text=True).strip()
+    except subprocess.CalledProcessError as e:
+        if e.output: print(e.output, file=sys.stderr)
+        raise
 
 
 def deploy(c):
