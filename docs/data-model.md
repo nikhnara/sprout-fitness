@@ -62,3 +62,9 @@ The live API account lacked `bigquery.tables.updateData`. Firestore had revision
 ## Remaining acceptance checks
 
 Browser visual verification was unavailable due to the computer-use approval service. DOM checks validate names and interaction but cannot prove pixel layout. Personalized avatar generation requires a chosen runtime provider and explicit photo-processing consent; the default sprite sheet is not personalized. Chain coverage is a dated starter library, not 11 complete current menus.
+
+## Verified live model (2026-10-09)
+
+Actual dataset location: `us-central1` (the release discovers it automatically). After the migration: 7,833 catalog foods; 25 source records; 39,165 nutrient rows; 11 restaurant groups. Latest diary views resolve 12 meals over 2 days for one owner. All 15 restored event payloads are valid version-1 JSON. Zero catalog rows have missing source relations or missing names. These aggregate checks avoid exposing individual meals or identity details.
+
+Login metadata export is also covered by integration tests: it contains only pseudonymous IDs/project/timestamps, suppresses repeated exports of the same session, and retries without blocking diary access after an analytics failure.

@@ -119,3 +119,23 @@ class APISecurity(unittest.TestCase):
  def test_malformed_connection_requests_fail_cleanly(self):
   self.assertEqual(self.post('/connections',['unexpected']).status_code,400)
   self.assertEqual(self.post('/imports/ack',['unexpected']).status_code,400)
+
+ def test_login_metadata_is_pseudonymous_and_same_session_is_not_reexported(self):
+  claims={'uid':'alice','email':'alice@example.test','email_verified':True,'auth_time':1791540000,'firebase':{'sign_in_provider':'google.com'}}
+  with patch.object(self.api.firebase_auth,'verify_id_token',return_value=claims):
+   self.assertEqual(self.client.get('/state',headers=self.headers()).status_code,200)
+   self.assertEqual(self.client.get('/state',headers=self.headers()).status_code,200)
+  self.assertEqual(self.api.bq.insert_rows_json.call_count,1)
+  table,rows=self.api.bq.insert_rows_json.call_args.args
+  self.assertTrue(table.endswith('.login_events'))
+  self.assertEqual(set(rows[0]),{'event_id','owner_id','auth_project','signed_in_at','observed_at'})
+  self.assertNotIn('alice',str(rows))
+
+ def test_login_metadata_failure_does_not_block_diary_and_retries(self):
+  claims={'uid':'alice','email':'alice@example.test','email_verified':True,'auth_time':1791540000,'firebase':{'sign_in_provider':'google.com'}}
+  self.api.bq.insert_rows_json.return_value=[{'error':'unavailable'}]
+  with patch.object(self.api.firebase_auth,'verify_id_token',return_value=claims):
+   self.assertEqual(self.client.get('/state',headers=self.headers()).status_code,200)
+   self.api.bq.insert_rows_json.return_value=[]
+   self.assertEqual(self.client.get('/state',headers=self.headers()).status_code,200)
+  self.assertEqual(self.api.bq.insert_rows_json.call_count,2)
