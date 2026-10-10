@@ -1,3 +1,4 @@
+import {brandFoods} from './brands.mjs';
 import {indianCatalog} from './indian.mjs';
 export function personalCatalog(catalog){
  const byId=id=>catalog.find(f=>f.id===id);
@@ -10,7 +11,7 @@ export function personalCatalog(catalog){
  const replacement=new Map(indian.extras.map(f=>[f.id,f]));
  const base=favorites.filter(f=>f.nutrients);
  const shelf=[...base.map(f=>replacement.get(f.id)||f),...indian.favorites.filter(f=>!base.some(x=>x.id===f.id))];
- return {favorites:shelf,extras:[chobani,chana,latte,...indian.extras],combos:[{id:'usual',name:'Your familiar plate',description:'Chana + rice + Chobani + latte',image:'assets/foods/chana.png',estimated:true,items:[[chana.id,450],['168878',200],[chobani.id,190],[latte.id,240]]},{id:'oats',name:'Build your oats bowl',description:'50 g oats + 200 g milk + 10 g chia',emoji:'🥣',items:[['169705',50],['171267',200],['170554',10]]},{id:'snack',name:'Protein + fruit',description:'Chobani Vanilla + a banana',image:'assets/chobani-vanilla.jpg',items:[[chobani.id,190],['173944',118]]}]};
+ return {favorites:shelf,extras:[chobani,chana,latte,...indian.extras,...brandFoods],combos:[{id:'usual',name:'Your familiar plate',description:'Chana + rice + Chobani + latte',image:'assets/foods/chana.png',estimated:true,items:[[chana.id,450],['168878',200],[chobani.id,190],[latte.id,240]]},{id:'oats',name:'Build your oats bowl',description:'50 g oats + 200 g milk + 10 g chia',emoji:'🥣',items:[['169705',50],['171267',200],['170554',10]]},{id:'snack',name:'Protein + fruit',description:'Chobani Vanilla + a banana',image:'assets/chobani-vanilla.jpg',items:[[chobani.id,190],['173944',118]]}]};
 }
 export function normalizeSearch(s){return s.toLowerCase().replace(/yogrut|yoghurt/g,'yogurt').replace(/panner/g,'paneer').replace(/\bbhindi\b/g,'okra').replace(/\bpalak\b/g,'spinach').replace(/\baloo\b/g,'potato').replace(/\bgobi\b/g,'cauliflower').replace(/\bdahi\b/g,'curd').replace(/\bchole\b/g,'chana').replace(/\baubergine\b|\bbrinjal\b/g,'eggplant').replace(/\bcapsicum\b/g,'pepper').replace(/\bcoriander leaves\b/g,'cilantro').replace(/[,·]/g,' ').replace(/\s+/g,' ').trim();}
 export function matchesFood(food,query){const text=normalizeSearch([food.name,food.displayName,food.aliases].filter(Boolean).join(' '));return normalizeSearch(query).split(' ').every(w=>text.includes(w));}

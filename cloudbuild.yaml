@@ -17,7 +17,7 @@ steps:
   - id: frontend-checks
     name: node:22-slim
     entrypoint: bash
-    args: ['-ceu', 'npm ci --ignore-scripts; node --check dist/app.js; npm test']
+    args: ['-ceu', 'npm ci --ignore-scripts; node --check dist/app.js; npm test; node scripts/build_catalog.mjs']
   - id: backend-checks
     name: python:3.12-slim
     entrypoint: bash

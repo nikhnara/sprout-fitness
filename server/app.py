@@ -70,6 +70,21 @@ def health(): return jsonify(status='ok')
 
 @app.get('/state')
 def read_state():
+    # An observed Firebase session, not a copy of credentials or a token log.
+    auth_time=request.claims.get('auth_time')
+    if isinstance(auth_time,(int,float)):
+        try:
+            session_id=hashlib.sha256(f'{request.owner}:{auth_time}'.encode()).hexdigest()
+            user=db.collection('users').document(request.owner)
+            prior=user.get().to_dict() or {}
+            if prior.get('last_exported_session')!=session_id:
+                now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+                signed=datetime.datetime.fromtimestamp(auth_time,datetime.timezone.utc).isoformat()
+                user.set({'auth_project':os.environ['FIREBASE_PROJECT_ID'],'last_sign_in':signed,'updated_at':now},merge=True)
+                row={'event_id':session_id,'owner_id':request.owner,'auth_project':os.environ['FIREBASE_PROJECT_ID'],'signed_in_at':signed,'observed_at':now}
+                errors=bq.insert_rows_json(TABLE.rsplit('.',1)[0]+'.login_events',[row],row_ids=[session_id])
+                if not errors:user.set({'last_exported_session':session_id},merge=True)
+        except Exception:app.logger.exception('Session metadata export pending')
     record=db.collection('diaries').document(request.owner).get()
     value=record.to_dict() if record.exists else {}
     return jsonify(state=value.get('state'),revision=value.get('revision',0),legacyEligible=request.claims.get('email','').casefold()==os.environ.get('OWNER_EMAIL','').casefold())

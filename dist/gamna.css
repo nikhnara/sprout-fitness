@@ -4,3 +4,14 @@
 .ring strong,.energy-details b,.macro strong{color:#263e32}.energy-details p{color:#60735a}.food-card-bottom b,.tray-orbit strong,.tray-macros b{color:#38552b}.tray-orbit small{color:#5a704b}.bar{background:#e3ead9}.checkin:nth-child(2){background:#eceaf4;color:#4d4967}.checkin:nth-child(3){background:#f3eddf;color:#655437}.settings-grid p{color:#62745c}.table-wrap{background:#fffdf8}.ingredient-source{color:#4c7433}.filter-chips button{background:#eef3e7}.identity-core.personal-avatar{overflow:visible}.profile{display:grid;place-items:center}.side-bottom b{color:#e3ecdf}.side-bottom p{color:#9cb39f}.progress-chart text{font-family:inherit}.welcome-features article{padding:0 8px}.card p{line-height:1.65}.gamna-avatar{transition:transform .35s}.identity-core:hover .gamna-avatar{transform:rotate(-5deg) translateY(-6px)}@media(max-width:800px){.profile{display:none}.shell>aside{height:76px}.shell>aside nav{width:100%}.shell>aside nav button{padding:8px 6px;min-width:45px}.shell>aside nav button span{font-size:9px}.card{padding:20px}.welcome-nav{display:flex!important}.welcome-features{gap:14px}}
 
 .progress-stats .card{transition:transform .25s,box-shadow .25s;border-bottom:5px solid #d9e3cd}.progress-stats .card:hover{transform:perspective(700px) rotateX(3deg) translateY(-5px);box-shadow:0 18px 30px #263e3312}.progress-chart polyline{stroke-dasharray:1500;stroke-dashoffset:0;animation:reveal-line 1.2s ease-out}.consistency span.logged{transform:perspective(200px) rotateX(12deg)}@keyframes reveal-line{from{stroke-dashoffset:1500}}@media(prefers-reduced-motion:reduce){.progress-stats .card:hover{transform:none}}
+
+/* Keep intrinsic image dimensions from covering the following food name. */
+.visual-food-card .food-front{display:block;position:relative;height:auto;aspect-ratio:4/3;overflow:hidden;isolation:isolate}
+.visual-food-card .food-front img,.visual-food-card .food-front>.food-symbol{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.visual-food-card .food-card-copy{position:relative;z-index:1;background:#fffdf8}
+.visual-food-card .food-card-copy h3{height:auto;min-height:44px;margin:0 0 8px;visibility:visible;opacity:1}
+.gamna-avatar.rendered-companion{object-fit:contain;filter:drop-shadow(0 15px 15px #17372726)}
+
+.gamna-avatar.rendered-companion{display:inline-block;aspect-ratio:3/4;background-image:url(assets/gamna-poses-v2.png);background-size:400% 300%;background-repeat:no-repeat;max-width:100%}
+
+.profile-photo{width:72px;height:72px;object-fit:cover;border-radius:50%;margin-top:12px}.gamna-avatar.rendered-companion{aspect-ratio:1/1}

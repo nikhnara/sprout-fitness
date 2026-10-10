@@ -60,6 +60,7 @@ def run(*args):
 
 
 def deploy(c):
+    run(sys.executable, 'scripts/migrate_catalog.py', '--project', c['PROJECT_ID'])
     settings = {'AUTH_MODE': 'multi', 'GOOGLE_CLOUD_PROJECT': c['PROJECT_ID'], 'OWNER_EMAIL': c['OWNER_EMAIL'],
                 'ALLOWED_ORIGINS': c['FRONTEND_ORIGIN'], 'FIREBASE_PROJECT_ID': c['firebase']['projectId'],
                 'BIGQUERY_TABLE': c['PROJECT_ID'] + '.fitness.events'}
