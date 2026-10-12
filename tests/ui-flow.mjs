@@ -14,8 +14,20 @@ assert.equal(document.querySelector('.shell').hidden,true);assert.match(document
 await app.openSession({uid:'alice',email:'alice@example.test',displayName:'Alice'});assert.equal(document.querySelector('.shell').hidden,false);
 assert.ok(document.querySelector('#onboard'));document.querySelector('#onboard').onsubmit({preventDefault(){},target:document.querySelector('#onboard')});
 app.navigate('food');assert.ok(document.querySelectorAll('.visual-food-card').length>0);assert.ok([...document.querySelectorAll('.food-card-copy h3')].every(e=>e.textContent.trim()));
-document.querySelector('[data-tray]').onclick();const input=document.querySelector('[data-grams]');input.value='380';Object.defineProperty(input,'valueAsNumber',{get(){return Number(this.value);}});input.oninput({target:input});assert.match(document.querySelector('#tray-energy').textContent,/280/);document.querySelector('#log-tray').onclick();await app.sync();
-assert.equal(cloud.get('alice').state.days[Object.keys(cloud.get('alice').state.days)[0]].meals[0].grams,380);
+// Every restaurant must expose available records even with a vegetarian profile and a stale search.
+const searchNode=document.querySelector('#search');searchNode.value='no-such-food';searchNode.oninput({target:searchNode});assert.equal(document.querySelector('#search'),searchNode,'typing must preserve the input and keyboard focus');
+for(const name of ['McDonald’s','Burger King','Wendy’s','Taco Bell','Chick-fil-A','Subway','KFC','Pizza Hut','Domino’s','Popeyes','Chipotle']){
+ const select=document.querySelector('#restaurant-filter');select.value=name;select.onchange({target:select});
+ assert.equal(document.querySelector('#entry-diet').value,'all');assert.equal(document.querySelector('#search').value,'');assert.ok(document.querySelectorAll('.entry-row').length>0, name+' has visible food choices');
+}
+// An explicit restrictive filter provides an in-place recovery action.
+const q=document.querySelector('#search');q.value='no-such-food';q.oninput({target:q});assert.ok(document.querySelector('#reset-food-filters'));document.querySelector('#reset-food-filters').onclick();assert.ok(document.querySelectorAll('.entry-row').length>0);
+const restaurant=document.querySelector('#restaurant-filter');restaurant.value='';restaurant.onchange({target:restaurant});
+document.querySelector('[data-entry-meal="Dinner"]').onclick();document.querySelector('[data-portion]').onclick();assert.equal(document.querySelector('#meal').value,'Dinner');
+const input=document.querySelector('#grams');input.value='380';input.oninput();assert.match(document.querySelector('#nutrition-preview').textContent,/280/);
+input.value='0';input.oninput();assert.equal(document.querySelector('#save-portion').disabled,true);input.value='380';input.oninput();
+document.querySelector('#portion-form').onsubmit({preventDefault(){}});await app.sync();
+const logged=cloud.get('alice').state.days[Object.keys(cloud.get('alice').state.days)[0]].meals[0];assert.equal(logged.grams,380);assert.equal(logged.meal,'Dinner');
 for(const tab of ['today','progress','training','settings','profile']){app.navigate(tab);assert.ok(document.querySelector('#content').textContent.trim());}
 app.navigate('profile');assert.ok(!document.querySelector('#content').textContent.includes('BigQuery'));const previousPose=document.querySelector('.pose-label').textContent;document.querySelector('#next-pose').onclick();assert.notEqual(document.querySelector('.pose-label').textContent,previousPose);
 context.testUid='bob';await app.openSession({uid:'bob',email:'bob@example.test',displayName:'Bob'});app.navigate('today');assert.match(document.querySelector('#content').textContent,/A fresh plate/);assert.ok(!document.querySelector('#content').textContent.includes('Chobani'));
